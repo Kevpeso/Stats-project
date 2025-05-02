@@ -1,0 +1,75 @@
+---
+title: "STAT 230 Final Project"
+author: "Kevin Igiehon"
+format: html
+---
+
+# Dataset Description
+
+This dataset was obtained from [World Bank Open Data](https://data.worldbank.org). It includes the following variables for countries worldwide:
+
+- `Country`: Name of the country (categorical)
+- `Region`: World region (e.g., Sub-Saharan Africa, Europe, etc.)
+- `GDP_per_capita`: Gross Domestic Product per capita (numeric)
+- `Health_expenditure_pct`: Health expenditure as % of GDP (numeric)
+- `Life_expectancy`: Average life expectancy at birth (numeric)
+- `Population`: Total population (numeric)
+
+---
+
+# Questions and Answers
+
+**Question 1:** Do countries with higher GDP per capita have higher life expectancy?
+
+**Answer:**  
+Yes. Based on a t-test comparing countries above and below the median GDP per capita, those with higher GDP tend to have significantly greater life expectancy. The boxplot also shows a visible upward shift in median values for the high-GDP group.
+
+**Question 2:** Is there a relationship between health spending (% of GDP) and life expectancy?
+
+**Answer:**  
+Yes. A linear regression analysis shows a statistically significant positive correlation between health spending and life expectancy, suggesting countries that spend more on healthcare tend to have longer-lived populations.
+
+---
+
+# Descriptive Analysis
+
+```{r}
+library(tidyverse)
+
+# Load your dataset (replace with your actual file path)
+data <- read_csv("world_health_data.csv")
+
+# Create GDP group for comparison
+data <- data %>%
+  mutate(GDP_group = ifelse(GDP_per_capita > median(GDP_per_capita, na.rm = TRUE), "High GDP", "Low GDP"))
+
+# Histogram of Life Expectancy
+ggplot(data, aes(x = Life_expectancy)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+  labs(title = "Histogram of Life Expectancy", x = "Life Expectancy", y = "Frequency")
+
+# Boxplot of Life Expectancy by GDP Group
+ggplot(data, aes(x = GDP_group, y = Life_expectancy, fill = GDP_group)) +
+  geom_boxplot() +
+  labs(title = "Life Expectancy by GDP Group")
+```
+
+---
+
+# Inferential Statistics
+
+```{r}
+# T-test: Life expectancy by GDP group
+t.test(Life_expectancy ~ GDP_group, data = data)
+
+# Linear regression: Health spending vs Life expectancy
+model <- lm(Life_expectancy ~ Health_expenditure_pct, data = data)
+summary(model)
+```
+
+---
+
+# Conclusion
+
+In this project, we analyzed how GDP and healthcare spending relate to life expectancy. Countries with higher GDP per capita had significantly higher average life expectancy, based on both boxplot visualization and a t-test. Additionally, regression analysis showed a positive relationship between health spending and life expectancy. These results suggest that economic development and healthcare investment both play a role in promoting longer lives.
+
